@@ -63,11 +63,128 @@
 
 **Contact**
 - **Maintainers:**: Use repository issues and PRs for discussion; add maintainers' contact details here as appropriate.
+# vproapp-devops-cicd
 
-**Next Steps**
-- **Verify:**: Run `mvn test` and `docker-compose up -d --build` to validate local startup.
-- **CI:**: Configure Jenkins credentials, agents, and environment variables to enable automated runs.
+[![Build Status](https://img.shields.io/badge/build-unknown-lightgrey.svg)](https://example-ci.example.com)
+[![License](https://img.shields.io/badge/license-UNLICENSED-red.svg)](LICENSE)
+
+Production-like Java web application example with containerized infrastructure, orchestration manifests, and CI/CD pipeline configuration.
+
+## Key Features
+- Java Spring MVC application with modular services and utilities.
+- Messaging with RabbitMQ; search with Elasticsearch; caching with Memcached.
+- Dockerized services and `docker-compose` for local and CI integration testing.
+- Jenkins pipeline for automated build/test/image workflows.
+
+## Quick Start
+
+Prerequisites:
+- Java JDK 11+ (or team's chosen JDK)
+- Maven 3.6+
+- Docker & Docker Compose
+- Git
+
+Build and run locally:
+
+```powershell
+mvn clean package
+mvn test
+docker-compose up -d --build
+```
+
+Stop containers:
+
+```powershell
+docker-compose down
+```
+
+## Recommended Workflow
+- Create a feature branch: `git checkout -b feat/your-feature`.
+- Implement code and add tests under `src/test/java`.
+- Run `mvn test` locally.
+- Build Docker images and verify with `docker-compose up`.
+- Push branch and open a pull request for review.
+
+## Repository Layout (high level)
+- `pom.xml` — Maven build and dependencies
+- `Jenkinsfile` — CI pipeline definition
+- `docker-compose.yml` — Local orchestration
+- `Docker-files/` — Docker build contexts for `app`, `db`, `web`
+- `src/main/java/com/visualpathit/account` — application code (controllers, services, repos, utils)
+- `src/main/resources` & `src/main/webapp/WEB-INF` — configuration and properties
+
+## Environment & Configuration
+- Keep secrets out of source. Use `app-secret.yml` only as an example; replace with your secret store.
+- Primary application configuration: `src/main/resources/application.properties`.
+- DB backup: `Docker-files/db/db_backup.sql` and `src/main/resources/db_backup.sql`.
+
+Common environment variables (examples):
+
+```text
+DB_HOST=postgres
+DB_PORT=5432
+RABBITMQ_HOST=rabbitmq
+ELASTICSEARCH_HOST=elasticsearch
+MEMCACHED_HOST=memcached
+SPRING_PROFILES_ACTIVE=dev
+```
+
+## Docker & Compose
+
+Build single image (app):
+
+```powershell
+docker build -t vproapp:local -f Docker-files/app/Dockerfile .
+```
+
+Use compose to start full stack:
+
+```powershell
+docker-compose up -d --build
+```
+
+## CI/CD (Jenkins)
+
+`Jenkinsfile` in the repo contains the pipeline used for build/test/image publish. Typical Jenkins stages:
+
+- Checkout
+- Build (`mvn clean package`)
+- Unit tests (`mvn test`)
+- Build Docker images
+- Publish images to registry (requires credentials)
+
+Example pipeline snippet:
+
+```groovy
+stage('Build') {
+	steps {
+		sh 'mvn -B -DskipTests=false clean package'
+	}
+}
+```
+
+Adjust shell command to Windows agents if necessary (PowerShell) and configure credentials in Jenkins.
+
+## Testing
+- Unit tests: `mvn test`
+- Add integration tests that start the compose stack with test profiles and run against the services.
+
+## Troubleshooting
+- If Docker services fail to start, inspect logs: `docker-compose logs -f`.
+- Common problems: port conflicts, insufficient memory for Docker Desktop on Windows, missing credentials for private registries.
+
+## Contributing
+- Create a branch, add tests, run `mvn test`, open a PR and request review.
+- Keep `pom.xml` changes minimal and documented in the PR description.
+
+## Maintainers
+- Use repository issues and PRs to contact maintainers. Add maintainers list or team contacts here.
+
+## Next Steps (suggested)
+- Run `mvn test` and `docker-compose up -d --build` locally to validate the stack.
+- Configure Jenkins credentials and agents to run the `Jenkinsfile` pipeline.
+- Optionally add automated integration tests and a health-check endpoint for readiness probes.
 
 ---
-Generated and updated by repository maintainers to reflect the current project structure and tooling.
+_This README was refined to provide clearer onboarding, commands and next actions for contributors and operators._
 
